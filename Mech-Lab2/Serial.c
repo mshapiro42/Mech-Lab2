@@ -2,7 +2,7 @@
  * Serial.c
  *
  * Created: 2/12/2020 12:13:50 PM
- * Updated 2/12/2020 2:15:00 PM
+ * Updated 2/12/2020 1:42:00 PM
  *  Authors: Anna Corman, Joslyne Lovelace, Megan Shapiro
  */ 
 #include "Serial.h"
