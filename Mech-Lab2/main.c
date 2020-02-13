@@ -11,6 +11,7 @@
 
 #include <util/delay.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "Ring_Buffer.h"
 #include "Serial.h"
 
@@ -23,32 +24,58 @@ int main(void)
 	USART_Init(MYUBRR);
 	rb_initialize_F(&input_queue);
     rb_initialize_F(&output_queue);
+	timer0_init();
+	timer1_init();
 	
 	/* Replace with your application code */
     while (1) 
     {
+		
     }
 }
 
 void timer0_init()
 {	
-	// timer with no prescaler, we will need one for 16MHz but not sure which yet
-	// need to add CTC information but not sure which register this is for Timer0
-	TCCR0 |= (1 << CS00);
+	// enable CTC for Timer0 and prescaler of 1024
+	TCCR0A |= (1 << WGM01)|(1 << CS02)|(1 << CS00);
 	
 	// initialize counter to zero
 	TCNT0 = 0;
 	
 	// initialize compare value for CTC
-	OCR1A = 
+	OCR0A = 156;
+	
+	// enable compare interrupt
+	TIMSK0 |= (1 << OCIE0A);
+	
+	// enable global interrupts
+	sei();
+}
+
+ISR (TIMER0_COMPA_vect)
+{
+	// add code to print float to Matlab
 }
 
 void timer1_init()
 {
-	// timer with no prescaler
-	// need to add setup for CTC
-	TCCR1B |= (1 << CS10);
+	// Enable CTC for Timer1 with no prescaler
+	TCCR1B |= (1 << WGM12)|(1 << CS10);
 	
 	// initialize counter to zero
-	TCNT2 = 0;
+	TCNT1 = 0;
+	
+	// initialize compare value
+	OCR1A = 15999;
+	
+	// enable compare interrupt
+	TIMSK1 |= (1 << OCIE1A);
+	
+	// enable global interrupts
+	sei(); 
+}
+
+ISR (TIMER1_CAPT_vect)
+{
+	// read analog and send to function to convert and filter
 }
