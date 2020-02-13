@@ -43,7 +43,7 @@ void timer0_init()
 	TCNT0 = 0;
 	
 	// initialize compare value for CTC
-	OCR0A = 156;
+	OCR0A = 155;
 	
 	// enable compare interrupt
 	TIMSK0 |= (1 << OCIE0A);
