@@ -30,3 +30,25 @@ int main(void)
     }
 }
 
+void timer0_init()
+{	
+	// timer with no prescaler, we will need one for 16MHz but not sure which yet
+	// need to add CTC information but not sure which register this is for Timer0
+	TCCR0 |= (1 << CS00);
+	
+	// initialize counter to zero
+	TCNT0 = 0;
+	
+	// initialize compare value for CTC
+	OCR1A = 
+}
+
+void timer1_init()
+{
+	// timer with no prescaler
+	// need to add setup for CTC
+	TCCR1B |= (1 << CS10);
+	
+	// initialize counter to zero
+	TCNT2 = 0;
+}
