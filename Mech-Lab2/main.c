@@ -24,21 +24,32 @@ int main(void)
 	USART_Init(MYUBRR);
 	rb_initialize_F(&input_queue);
     rb_initialize_F(&output_queue);
-	timer0_init();
-	timer1_init();
+	void timer0_init();
+	void timer1_init();
 	
 	/* Replace with your application code */
     while (1) 
     {
 		//if TIMER0_flag
+		if(TIFR0 & (1 << OCF0A))
+		{
 			//dequeue output
+			float output = rb_pop_front_F(output_queue);
 			//print_float
+			print_float(output);
+			//reset TIMER0_flag
+			TIFR0 |= (1 << OCF0A);
+		}
 		//elseif TIMER1_flag
+		else(TIFR1 & (1 << OCF1A))
+		{
 			//collect input
 			//convert to velocity
 			//filter value
 			//add to output queue
-		
+			//reset TIMER1_flag
+			TIFR1 |= (1 << OCF1A);
+		}
     }
 }
 
@@ -55,14 +66,6 @@ void timer0_init()
 	
 	// enable compare interrupt
 	TIMSK0 |= (1 << OCIE0A);
-	
-	// enable global interrupts
-	sei();
-}
-
-ISR (TIMER0_COMPA_vect)
-{
-	// add code to set flag
 }
 
 void timer1_init()
@@ -78,12 +81,4 @@ void timer1_init()
 	
 	// enable compare interrupt
 	TIMSK1 |= (1 << OCIE1A);
-	
-	// enable global interrupts
-	sei(); 
-}
-
-ISR (TIMER1_CAPT_vect)
-{
-	//set flag
 }
