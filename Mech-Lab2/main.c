@@ -30,6 +30,14 @@ int main(void)
 	/* Replace with your application code */
     while (1) 
     {
+		//if TIMER0_flag
+			//dequeue output
+			//print_float
+		//elseif TIMER1_flag
+			//collect input
+			//convert to velocity
+			//filter value
+			//add to output queue
 		
     }
 }
@@ -54,7 +62,7 @@ void timer0_init()
 
 ISR (TIMER0_COMPA_vect)
 {
-	// add code to print float to Matlab
+	// add code to set flag
 }
 
 void timer1_init()
@@ -77,5 +85,5 @@ void timer1_init()
 
 ISR (TIMER1_CAPT_vect)
 {
-	// read analog and send to function to convert and filter
+	//set flag
 }

@@ -28,7 +28,7 @@ float receive_float() { //Collect float from USART
 	
 	union floatChars a; // create helper union instance
 	for(uint8_t i = 0; i < 4; i++){ //for 4 bytes
-		while(!(UCSR0A & (1<<RXC0))); //wait for new byte
+		while(!(newMsg)); //wait for new byte
 		a.asChar[i] = receive_byte(); //collect byte
 	}
 	return a.asFloat; //return float value
@@ -36,7 +36,7 @@ float receive_float() { //Collect float from USART
 
 
 void print_byte(uint8_t value){
-	while(!(UCSR0A & (1<<UDRE0))); //after transmit line is ready
+	while(!(transmitReady())); //after transmit line is ready
 	UDR0 = value; //set transmit register to value
 }
 
@@ -50,4 +50,8 @@ void print_float(float value){
 
 uint8_t newMsg() {
 	return UCSR0A & (1<<RXC0);
+}
+
+uint8_t transmitReady(){
+	return UCSR0A & (1<<UDRE0);
 }
