@@ -40,8 +40,8 @@ int main(void)
 			//reset TIMER0_flag
 			TIFR0 |= (1 << OCF0A);
 		}
-		//elseif TIMER1_flag
-		else(TIFR1 & (1 << OCF1A))
+		//if TIMER1_flag
+		if(TIFR1 & (1 << OCF1A))
 		{
 			//collect input
 			//convert to velocity
@@ -71,7 +71,7 @@ void timer0_init()
 void timer1_init()
 {
 	// Enable CTC for Timer1 with no prescaler
-	TCCR1B |= (1 << WGM12)|(1 << CS10);
+	TCCR1A |= (1 << WGM12)|(1 << CS10);
 	
 	// initialize counter to zero
 	TCNT1 = 0;
