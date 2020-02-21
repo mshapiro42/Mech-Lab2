@@ -34,7 +34,7 @@ int main(void)
 		if(TIFR0 & (1 << OCF0A))
 		{
 			//dequeue output
-			float output = rb_pop_front_F(output_queue);
+			float output = rb_pop_front_F(&output_queue);
 			//print_float
 			print_float(output);
 			//reset TIMER0_flag

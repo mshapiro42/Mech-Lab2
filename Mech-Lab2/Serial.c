@@ -5,6 +5,7 @@
  * Updated 2/12/2020 1:42:00 PM
  *  Authors: Anna Corman, Joslyne Lovelace, Megan Shapiro
  */ 
+#include <avr/io.h>
 #include "Serial.h"
 
 union floatChars {
