@@ -30,7 +30,7 @@ int main(void)
 	//Set AI0 to Output and rest as Input
 	DDRC = 0b10000000;
 	//Set output to 1 to power sensor
-	PINC0 = 1;
+	PORTC = 0b10000000;
 	
 	/* Replace with your application code */
     while (1) 
@@ -49,6 +49,7 @@ int main(void)
 		if(TIFR1 & (1 << OCF1A))
 		{
 			//collect input
+			
 			//convert to velocity
 			//filter value
 			//add to output queue

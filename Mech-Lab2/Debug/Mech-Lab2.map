@@ -222,7 +222,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x1a4
+.text           0x00000000      0x1aa
  *(.vectors)
  .vectors       0x00000000       0x68 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.3.300/gcc/dev/atmega328p/avr5/crtatmega328p.o
                 0x00000000                __vector_default
@@ -316,19 +316,19 @@ END GROUP
  .text.print_float
                 0x000000bc       0x50 Serial.o
                 0x000000bc                print_float
- .text.main     0x0000010c       0x46 main.o
+ .text.main     0x0000010c       0x4c main.o
                 0x0000010c                main
  .text.rb_initialize_F
-                0x00000152        0x8 Ring_Buffer.o
-                0x00000152                rb_initialize_F
+                0x00000158        0x8 Ring_Buffer.o
+                0x00000158                rb_initialize_F
  .text.rb_pop_front_F
-                0x0000015a       0x46 Ring_Buffer.o
-                0x0000015a                rb_pop_front_F
-                0x000001a0                . = ALIGN (0x2)
+                0x00000160       0x46 Ring_Buffer.o
+                0x00000160                rb_pop_front_F
+                0x000001a6                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x000001a0        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
-                0x000001a0                _exit
-                0x000001a0                exit
+ .fini9         0x000001a6        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x000001a6                _exit
+                0x000001a6                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -347,11 +347,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x000001a0        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x000001a6        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x000001a4                _etext = .
+                0x000001aa                _etext = .
 
-.data           0x00800100        0x0 load address 0x000001a4
+.data           0x00800100        0x0 load address 0x000001aa
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -369,8 +369,8 @@ END GROUP
  *(.bss*)
  *(COMMON)
                 [!provide]                PROVIDE (__bss_end, .)
-                0x000001a4                __data_load_start = LOADADDR (.data)
-                0x000001a4                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x000001aa                __data_load_start = LOADADDR (.data)
+                0x000001aa                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800100        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
@@ -469,12 +469,12 @@ END GROUP
  .debug_abbrev  0x0000074d      0x11e main.o
  .debug_abbrev  0x0000086b       0xed Ring_Buffer.o
 
-.debug_line     0x00000000      0x738
+.debug_line     0x00000000      0x744
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x133 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.3.300/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_line    0x00000133      0x18d Serial.o
- .debug_line    0x000002c0      0x13f main.o
- .debug_line    0x000003ff      0x339 Ring_Buffer.o
+ .debug_line    0x000002c0      0x14b main.o
+ .debug_line    0x0000040b      0x339 Ring_Buffer.o
 
 .debug_frame    0x00000000      0x210
  *(.debug_frame)
