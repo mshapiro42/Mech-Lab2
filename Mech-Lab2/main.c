@@ -27,6 +27,11 @@ int main(void)
 	void timer0_init();
 	void timer1_init();
 	
+	//Set AI0 to Output and rest as Input
+	DDRC = 0b10000000;
+	//Set output to 1 to power sensor
+	PINC0 = 1;
+	
 	/* Replace with your application code */
     while (1) 
     {
