@@ -14,6 +14,7 @@
 #include <avr/interrupt.h>
 #include "Ring_Buffer.h"
 #include "Serial.h"
+#include "Dig_Filter.h"
 
 
 
@@ -32,6 +33,9 @@ int main(void)
 	//Set output to 1 to power sensor
 	PORTC = 0b10000000;
 	
+	//Sampling period for converting to velocity, 1 over since we divide by the sampling period
+	float sampPer = 1/0.001;
+	
 	/* Replace with your application code */
     while (1) 
     {
@@ -49,13 +53,18 @@ int main(void)
 		if(TIFR1 & (1 << OCF1A))
 		{
 			//collect input
-			
+			float volt = PINC1;
+			//convert to position
+			float angPos = volt; //add equation to covert
 			//convert to velocity
-			//filter value
+			float angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer;
+			//add angPos to queue
+			rb_push_back_F(&input_queue,angPos);
+			//filter velocity
 			//add to output queue
 			//reset TIMER1_flag
 			TIFR1 |= (1 << OCF1A);
-		}
+		} 
     }
 }
 
