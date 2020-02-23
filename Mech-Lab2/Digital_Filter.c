@@ -1,3 +1,4 @@
+#include <avr/io.h>
 #include "Digital_Filter.h"
 #include "Ring_Buffer.h"
 
@@ -18,6 +19,8 @@ void digital_filter_init(float reading){
 		rb_push_front_F(&inputs, reading);
 		rb_push_front_F(&outputs, reading);
 	}
+	
+	return;
 }
 
 float filterValue(float angularVelocity){

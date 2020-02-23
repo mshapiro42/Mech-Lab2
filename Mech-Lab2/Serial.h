@@ -12,5 +12,3 @@ uint8_t receive_byte();
 float receive_float();
 void print_byte(uint8_t);
 void print_float(float);
-uint8_t newMsg();
-uint8_t transmitReady();

@@ -3,7 +3,7 @@
 * Digital_Filter.h
 * 
 * Created : 2/23/20 1:15pm
-* Author : Megan Shapiro
+* Author : Anna Corman, Joslyne Lovelace, Megan Shapiro
 * 
 */
 
@@ -22,3 +22,5 @@ void digital_filter_init(float reading);
 
 // Return the filtered value
 float filterValue(float angularVelocity);
+
+#endif

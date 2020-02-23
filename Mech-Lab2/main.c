@@ -12,11 +12,14 @@
 #include <util/delay.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "Ring_Buffer.h"
 #include "Serial.h"
+#include "Ring_Buffer.h"
 #include "Digital_Filter.h"
 
+uint8_t filtInit = 0;
 
+void timer0_init();
+void timer1_init();
 
 int main(void)
 {
@@ -25,6 +28,7 @@ int main(void)
 	USART_Init(MYUBRR);
 	rb_initialize_F(&input_queue);
     rb_initialize_F(&output_queue);
+
 	timer0_init();
 	timer1_init();
 	
@@ -34,9 +38,10 @@ int main(void)
 	PORTC = 0b10000000;
 	
 	//Sampling period for converting to velocity, 1 over since we divide by the sampling period
-	float sampPer = 1/0.001;
-	
-	/* Replace with your application code */
+	//float sampPer = 1/0.001;
+	float volt, angPos;
+	//float angVel = 0;
+
     while (1) 
     {
 		//if TIMER0_flag
@@ -53,15 +58,28 @@ int main(void)
 		if(TIFR1 & (1 << OCF1A))
 		{
 			//collect input
-			float volt = PINC1;
+			volt = PINC1;
+			
 			//convert to position
-			float angPos = volt; //add equation to covert
+			angPos = volt; //add equation to covert
+			
 			//convert to velocity
-			//float angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer;
+			//angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer;
+			
+			/*if(!filtInit){
+				digital_filter_init(angVel);
+				filtInit = 1;
+			}*/
+			
 			//add angPos to queue
-			rb_push_back_F(&output_queue,angPos); //needs to change to inputqueue for this is for testing
+			rb_push_back_F(&output_queue, angPos); //needs to change to input_queue for this is for testing
+			
 			//filter velocity
+			//angVel = filterValue(angVel);
+			
 			//add to output queue
+			//rb_push_back_F(&output_queue, angVel);
+			
 			//reset TIMER1_flag
 			TIFR1 |= (1 << OCF1A);
 		} 
