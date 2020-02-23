@@ -20,6 +20,7 @@ uint8_t filtInit = 0;
 
 void timer0_init();
 void timer1_init();
+void adc_init();
 
 int main(void)
 {
@@ -33,9 +34,10 @@ int main(void)
 	timer1_init();
 	
 	//Set AI0 to Output and rest as Input
-	DDRC = 0b10000000;
+	DDRC |= 0b10000000;
+	
 	//Set output to 1 to power sensor
-	PORTC = 0b10000000;
+	PORTC |= 0b10000000;
 	
 	//Sampling period for converting to velocity, 1 over since we divide by the sampling period
 	//float sampPer = 1/0.001;
@@ -44,21 +46,28 @@ int main(void)
 
     while (1) 
     {
+		//print_byte('.');
 		//if TIMER0_flag
-		if(TIFR0 & (1 << OCF0A))
+		if((TIFR0 & (1 << OCF0A)))
 		{
+			
 			//dequeue output
 			float output = rb_pop_front_F(&output_queue);
-			//print_float
+			
+			//print_float*/
 			print_float(output);
+			
+			//print_float(400);
+			//print_byte('a');
 			//reset TIMER0_flag
 			TIFR0 |= (1 << OCF0A);
 		}
 		//if TIMER1_flag
-		if(TIFR1 & (1 << OCF1A))
+		if((TIFR1 & (1 << OCF1B)))
 		{
+			
 			//collect input
-			volt = PINC1;
+			volt = (ADCH<<8) + (ADCL);
 			
 			//convert to position
 			angPos = volt; //add equation to covert
@@ -73,12 +82,14 @@ int main(void)
 			
 			//add angPos to queue
 			rb_push_back_F(&output_queue, angPos); //needs to change to input_queue for this is for testing
-			
+
 			//filter velocity
 			//angVel = filterValue(angVel);
 			
 			//add to output queue
 			//rb_push_back_F(&output_queue, angVel);
+
+			
 			
 			//reset TIMER1_flag
 			TIFR1 |= (1 << OCF1A);
@@ -88,8 +99,9 @@ int main(void)
 
 void timer0_init()
 {	
+	TCCR0A |= (1 << WGM01);
 	// enable CTC for Timer0 and prescaler of 1024
-	TCCR0A |= (1 << WGM01)|(1 << CS02)|(1 << CS00);
+	TCCR0B |= (1 << CS02)|(1 << CS00);
 	
 	// initialize counter to zero
 	TCNT0 = 0;
@@ -98,20 +110,38 @@ void timer0_init()
 	OCR0A = 155;
 	
 	// enable compare interrupt
-	TIMSK0 |= (1 << OCIE0A);
+	//TIMSK0 |= (1 << OCIE0A);
 }
 
 void timer1_init()
 {
+	TCCR1A |= 0;
 	// Enable CTC for Timer1 with no prescaler
-	TCCR1A |= (1 << WGM12)|(1 << CS10);
-	
+	TCCR1B |= (1 << WGM12)|(1 << CS10);
+	//TCCR1B |= (1 << WGM12)|(1 << CS12)|(1 << CS10);
 	// initialize counter to zero
 	TCNT1 = 0;
 	
 	// initialize compare value
-	OCR1A = 15999;
+	OCR1B = 15999;
 	
 	// enable compare interrupt
-	TIMSK1 |= (1 << OCIE1A);
+	//TIMSK1 |= (1 << OCIE1A);
+}
+
+
+void adc_init() {
+	
+	//Set reference to built in channels, set MUX to ADC1
+	ADMUX = (1<<REFS0)|(1<<MUX0);
+	
+	//Enable ADC w/ auto-trigger
+	ADCSRA = (1<<ADEN)|(1<<ADATE);
+	
+	//Set auto-trigger source to timer1 compare match
+	ADCSRB = (1<<ADTS2)|(1<<ADTS0);
+	
+	//Disable digital input buffer on ADC1, saves power
+	DIDR0 = (1<<ADC1D);
+	
 }
