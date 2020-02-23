@@ -57,9 +57,9 @@ int main(void)
 			//convert to position
 			float angPos = volt; //add equation to covert
 			//convert to velocity
-			float angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer;
+			//float angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer;
 			//add angPos to queue
-			rb_push_back_F(&input_queue,angPos);
+			rb_push_back_F(&output_queue,angPos); //needs to change to inputqueue for this is for testing
 			//filter velocity
 			//add to output queue
 			//reset TIMER1_flag
