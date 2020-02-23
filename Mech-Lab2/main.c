@@ -14,7 +14,7 @@
 #include <avr/interrupt.h>
 #include "Ring_Buffer.h"
 #include "Serial.h"
-#include "Dig_Filter.h"
+#include "Digital_Filter.h"
 
 
 
@@ -25,8 +25,8 @@ int main(void)
 	USART_Init(MYUBRR);
 	rb_initialize_F(&input_queue);
     rb_initialize_F(&output_queue);
-	void timer0_init();
-	void timer1_init();
+	timer0_init();
+	timer1_init();
 	
 	//Set AI0 to Output and rest as Input
 	DDRC = 0b10000000;
