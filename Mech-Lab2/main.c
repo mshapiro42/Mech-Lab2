@@ -14,6 +14,7 @@
 #include <avr/interrupt.h>
 #include "Ring_Buffer.h"
 #include "Serial.h"
+#include "Dig_Filter.h"
 
 
 
@@ -26,6 +27,14 @@ int main(void)
     rb_initialize_F(&output_queue);
 	void timer0_init();
 	void timer1_init();
+	
+	//Set AI0 to Output and rest as Input
+	DDRC = 0b10000000;
+	//Set output to 1 to power sensor
+	PORTC = 0b10000000;
+	
+	//Sampling period for converting to velocity, 1 over since we divide by the sampling period
+	float sampPer = 1/0.001;
 	
 	/* Replace with your application code */
     while (1) 
@@ -40,16 +49,22 @@ int main(void)
 			//reset TIMER0_flag
 			TIFR0 |= (1 << OCF0A);
 		}
-		//elseif TIMER1_flag
-		else(TIFR1 & (1 << OCF1A))
+		//if TIMER1_flag
+		if(TIFR1 & (1 << OCF1A))
 		{
 			//collect input
+			float volt = PINC1;
+			//convert to position
+			float angPos = volt; //add equation to covert
 			//convert to velocity
-			//filter value
+			//float angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer;
+			//add angPos to queue
+			rb_push_back_F(&output_queue,angPos); //needs to change to inputqueue for this is for testing
+			//filter velocity
 			//add to output queue
 			//reset TIMER1_flag
 			TIFR1 |= (1 << OCF1A);
-		}
+		} 
     }
 }
 
@@ -71,7 +86,7 @@ void timer0_init()
 void timer1_init()
 {
 	// Enable CTC for Timer1 with no prescaler
-	TCCR1B |= (1 << WGM12)|(1 << CS10);
+	TCCR1A |= (1 << WGM12)|(1 << CS10);
 	
 	// initialize counter to zero
 	TCNT1 = 0;
