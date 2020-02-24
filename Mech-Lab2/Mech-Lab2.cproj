@@ -136,6 +136,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Digital_Filter.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Digital_Filter.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Serial.c">
       <SubType>compile</SubType>
     </Compile>
