@@ -65,7 +65,10 @@ int main(void)
 		//if TIMER1_flag
 		if((TIFR1 & (1 << OCF1B)))
 		{
-			
+			// start ADC conversion
+			ADCSRA |= (1<<ADSC);
+			// wait until conversion is complete
+			while(ADCSRA &(1<<ADSC));
 			//collect input
 			volt = (ADCH<<8) + (ADCL);
 			
@@ -99,8 +102,9 @@ int main(void)
 
 void timer0_init()
 {	
+	// enable CTC for Timer0
 	TCCR0A |= (1 << WGM01);
-	// enable CTC for Timer0 and prescaler of 1024
+	// enable prescaler of 1024 for Timer0
 	TCCR0B |= (1 << CS02)|(1 << CS00);
 	
 	// initialize counter to zero
@@ -108,9 +112,6 @@ void timer0_init()
 	
 	// initialize compare value for CTC
 	OCR0A = 155;
-	
-	// enable compare interrupt
-	//TIMSK0 |= (1 << OCIE0A);
 }
 
 void timer1_init()
@@ -124,15 +125,12 @@ void timer1_init()
 	
 	// initialize compare value
 	OCR1B = 15999;
-	
-	// enable compare interrupt
-	//TIMSK1 |= (1 << OCIE1A);
 }
 
 
 void adc_init() {
 	
-	//Set reference to built in channels, set MUX to ADC1
+	//Set reference to built in channels, set MUX to ADC1 to read from AI1
 	ADMUX = (1<<REFS0)|(1<<MUX0);
 	
 	//Enable ADC w/ auto-trigger
