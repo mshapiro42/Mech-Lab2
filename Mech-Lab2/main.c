@@ -140,7 +140,7 @@ void adc_init() {
 	ADMUX = (1<<REFS0);
 	//Enable ADC w/ auto-trigger
 	//ADCSRA = (1<<ADEN)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
-	ADCSRA = (1<<ADEN);
+	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 	//Set auto-trigger source to timer1 compare match
 	//ADCSRB = (1<<ADTS2)|(1<<ADTS0);
 	

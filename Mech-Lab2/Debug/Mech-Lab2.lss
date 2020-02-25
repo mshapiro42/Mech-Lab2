@@ -225,8 +225,8 @@ void adc_init() {
  15a:	80 93 7c 00 	sts	0x007C, r24	; 0x80007c <__DATA_REGION_ORIGIN__+0x1c>
 	//Enable ADC w/ auto-trigger
 	//ADCSRA = (1<<ADEN)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
-	ADCSRA = (1<<ADEN);
- 15e:	80 e8       	ldi	r24, 0x80	; 128
+	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
+ 15e:	87 e8       	ldi	r24, 0x87	; 135
  160:	80 93 7a 00 	sts	0x007A, r24	; 0x80007a <__DATA_REGION_ORIGIN__+0x1a>
  164:	08 95       	ret
 
