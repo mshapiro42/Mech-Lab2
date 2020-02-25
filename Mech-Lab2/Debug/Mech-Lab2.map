@@ -49,8 +49,8 @@ Discarded input sections
                 0x00000000       0x50 Digital_Filter.o
  .text.filterValue
                 0x00000000      0x11a Digital_Filter.o
- .data.b        0x00000000       0x10 Digital_Filter.o
- .data.a        0x00000000       0x10 Digital_Filter.o
+ .data.b        0x00000000       0x14 Digital_Filter.o
+ .data.a        0x00000000       0x14 Digital_Filter.o
  .debug_info    0x00000000      0x320 Digital_Filter.o
  .debug_abbrev  0x00000000      0x115 Digital_Filter.o
  .debug_loc     0x00000000      0x19f Digital_Filter.o
