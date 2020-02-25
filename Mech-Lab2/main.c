@@ -36,10 +36,10 @@ int main(void)
 	adc_init();
 	
 	//Set AI0 to Output and rest as Input
-	DDRC |= 0b10000000;
+	DDRC |= 0b00000001;
 	
 	//Set output to 1 to power sensor
-	PORTC |= 0b10000000;
+	PORTC |= 0b00000001;
 	
 	//Sampling period for converting to velocity, 1 over since we divide by the sampling period
 	//float sampPer = 1/0.001;
