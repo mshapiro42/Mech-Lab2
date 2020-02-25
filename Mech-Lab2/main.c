@@ -12,6 +12,7 @@
 #include <util/delay.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <math.h>
 #include "Serial.h"
 #include "Ring_Buffer.h"
 #include "Digital_Filter.h"
@@ -41,8 +42,8 @@ int main(void)
 	//Set output to 1 to power sensor
 	PORTC |= 0b00000001;
 	
-	//Sampling period for converting to velocity, 1 over since we divide by the sampling period
-	//float sampPer = 1/0.001;
+	//Sampling period for converting to velocity, 1/0.001
+	//float sampPer = 1000;
 	float volt;
 	//, angPos;
 	//float angVel = 0;
@@ -52,34 +53,21 @@ int main(void)
 		//print_byte('.');
 		//if TIMER0_flag
 		if((TIFR0 & (1 << OCF0A)))
-		{
-			
+		{		
 			//dequeue output
-			//float output = rb_pop_front_F(&output_queue);
-			
+			float output = rb_pop_front_F(&output_queue);			
 			//print_float*/
-			//print_float(output);
-			
-			//print_float(400);
-			//print_byte('a');
+			print_float(output);
 			//reset TIMER0_flag
 			TIFR0 |= (1 << OCF0A);
 		}
 		//if TIMER1_flag
 		if((TIFR1 & (1 << OCF1B)))
 		{
-			//ADMUX = (ADMUX & 0xF8)|(1 &= 0b00000111);
-			//ADCSRA |= (1<<ADSC);
-			// wait until conversion is complete
-			//while(ADCSRA &(1<<ADSC));
-			//collect input
-			//volt = (ADCH<<8) + (ADCL);
-			volt = adc_read(1);
-			
-			print_float(volt);
+			//read voltage 
+			volt = adc_read(1);	
 			//convert to position
-			//angPos = volt; //add equation to covert
-			
+			//angPos = (1.5628E-10)*(pow(volt,4)) + (-3.1125E-7)*(pow(volt,3)) + (2.1123E-4)*(pow(volt,2)) + (-0.0483)*volt + 7.5903; 		
 			//convert to velocity
 			//angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer;
 			
@@ -89,15 +77,13 @@ int main(void)
 			}*/
 			
 			//add angPos to queue
-			//rb_push_back_F(&output_queue, angPos); //needs to change to input_queue for this is for testing
+			rb_push_back_F(&output_queue, volt); //needs to change to input_queue for this is for testing
 
 			//filter velocity
 			//angVel = filterValue(angVel);
 			
-			//add to output queue
-			//rb_push_back_F(&output_queue, angVel);
-
-			
+			//add velocity to output queue
+			//rb_push_back_F(&output_queue, angVel);			
 			
 			//reset TIMER1_flag
 			TIFR1 |= (1 << OCF1A);
@@ -110,11 +96,9 @@ void timer0_init()
 	// enable CTC for Timer0
 	TCCR0A |= (1 << WGM01);
 	// enable prescaler of 1024 for Timer0
-	TCCR0B |= (1 << CS02)|(1 << CS00);
-	
+	TCCR0B |= (1 << CS02)|(1 << CS00);	
 	// initialize counter to zero
-	TCNT0 = 0;
-	
+	TCNT0 = 0;	
 	// initialize compare value for CTC
 	OCR0A = 155;
 }
@@ -124,10 +108,8 @@ void timer1_init()
 	TCCR1A |= 0;
 	// Enable CTC for Timer1 with no prescaler
 	TCCR1B |= (1 << WGM12)|(1 << CS10);
-	//TCCR1B |= (1 << WGM12)|(1 << CS12)|(1 << CS10);
 	// initialize counter to zero
-	TCNT1 = 0;
-	
+	TCNT1 = 0;	
 	// initialize compare value
 	OCR1B = 15999;
 }
@@ -153,14 +135,11 @@ uint16_t adc_read(uint8_t ch)
 {
 	//select channel to read
 	ch &= 0b00000111;
-	ADMUX = (ADMUX & 0xF8)|ch;
-	
+	ADMUX = (ADMUX & 0xF8)|ch;	
 	//start conversion
-	ADCSRA |= (1<<ADSC);
-	
+	ADCSRA |= (1<<ADSC);	
 	//wait for conversion to complete
-	while(ADCSRA & (1<<ADSC));
-	
+	while(ADCSRA & (1<<ADSC));	
 	//return result
 	return (ADC);
 }
