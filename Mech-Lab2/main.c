@@ -42,11 +42,11 @@ int main(void)
 	//Set output to 1 to power sensor
 	PORTC |= 0b00000001;
 	
-	//Sampling period for converting to velocity, 1/0.001
-	//float sampPer = 1000;
-	float volt;
-	//, angPos;
-	//float angVel = 0;
+	//Sampling frequency for converting to velocity, 1/0.001
+	float sampPer = 1000;
+	float volt, angPos;
+	float angPosLast = 0;
+	float angVel = 0;
 
     while (1) 
     {
@@ -66,25 +66,31 @@ int main(void)
 		{
 			//read voltage 
 			volt = adc_read(1);	
-			//convert to position
-			//angPos = (1.5628E-10)*(pow(volt,4)) + (-3.1125E-7)*(pow(volt,3)) + (2.1123E-4)*(pow(volt,2)) + (-0.0483)*volt + 7.5903; 		
+			//convert to position in radians
+			angPos = (-1.347E-13)*(pow(volt,6)) + (4.0362E-10)*(pow(volt,5)) + (-4.6747E-7)*(pow(volt,4)) + (2.6326E-4)*(pow(volt,3)) + -0.0743*(pow(volt,2)) + 10.1678*volt + (-645.4082 + 120); 
+			//wrap result
+
 			//convert to velocity
-			//angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer;
+			//angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer*0.16667;
+			angVel = (angPos - angPosLast);
+			angVel =
+			angVel *= sampPer*0.16667;
 			
-			/*if(!filtInit){
+			if(!filtInit){
 				digital_filter_init(angVel);
 				filtInit = 1;
-			}*/
+			}
 			
 			//add angPos to queue
-			rb_push_back_F(&output_queue, volt); //needs to change to input_queue for this is for testing
-
+			angPosLast = angPos;
+			rb_push_back_F(&input_queue, angPos); //needs to change to input_queue for this is for testing
+			
 			//filter velocity
-			//angVel = filterValue(angVel);
-			
+			angVel = filterValue(angVel);
+				
 			//add velocity to output queue
-			//rb_push_back_F(&output_queue, angVel);			
-			
+			rb_push_back_F(&output_queue, angVel);			
+		
 			//reset TIMER1_flag
 			TIFR1 |= (1 << OCF1A);
 		} 
