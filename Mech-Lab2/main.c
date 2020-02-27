@@ -13,6 +13,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <math.h>
+#include <stdlib.h>
 #include "Serial.h"
 #include "Ring_Buffer.h"
 #include "Digital_Filter.h"
@@ -43,7 +44,7 @@ int main(void)
 	PORTC |= 0b00000001;
 	
 	//Sampling frequency for converting to velocity, 1/0.001
-	float sampPer = 1000;
+	//float sampPer = 1000;
 	float volt, angPos;
 	float angPosLast = 0;
 	float angVel = 0;
@@ -72,9 +73,17 @@ int main(void)
 
 			//convert to velocity
 			//angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer*0.16667;
-			angVel = (angPos - angPosLast);
-			angVel =
-			angVel *= sampPer*0.16667;
+			//angVel = (abs(angPos - angPosLast));//*sampPer;
+			
+			//need to add sampling frequency 
+			if(angPos < angPosLast)
+			{
+				angVel = (angPos - angPosLast) + 360;
+			} else
+			{
+				angVel = (angPos - angPosLast);
+			}
+			
 			
 			if(!filtInit){
 				digital_filter_init(angVel);
@@ -83,7 +92,7 @@ int main(void)
 			
 			//add angPos to queue
 			angPosLast = angPos;
-			rb_push_back_F(&input_queue, angPos); //needs to change to input_queue for this is for testing
+			//rb_push_back_F(&input_queue, angPos); //needs to change to input_queue for this is for testing
 			
 			//filter velocity
 			angVel = filterValue(angVel);
