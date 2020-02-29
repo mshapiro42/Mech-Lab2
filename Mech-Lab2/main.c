@@ -93,8 +93,8 @@ int main(void)
 			
 			//filter velocity
 			//filteredVel.asFloat = filterValue(angVel);
-			filteredVel = filterValue(angVel);
-				
+			//filteredVel = filterValue(angVel);
+			filteredVel = angVel;	
 			//reset TIMER1_flag
 			TIFR1 |= (1 << OCF1A);
 		} 

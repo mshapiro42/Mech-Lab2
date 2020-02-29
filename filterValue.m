@@ -1,12 +1,11 @@
-function outputs = filterValue(newInput, inputs, outputs, b, a)
-    inputs = [newInput, inputs(1:4)];
+function filteredValue = filterValue(inputs, outputs, b, a)
     sum = 0;
     for i=1:5
         sum = sum + b(i)*inputs(i);
         if (i > 1)
-            sum = sum - a(i)*outputs(i);
+            sum = sum - a(i)*outputs(i-1);
         end
     end
     sum = sum * 1/a(1);
-    outputs = [sum, outputs(1:4)];
+    filteredValue = sum;
 end
