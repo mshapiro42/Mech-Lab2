@@ -17,6 +17,11 @@
 #include "Serial.h"
 #include "Ring_Buffer.h"
 #include "Digital_Filter.h"
+/*
+union floatChar(){
+	float asFloat;
+	char asChars[4];
+};*/
 
 uint8_t filtInit = 0;
 
@@ -25,13 +30,15 @@ void timer1_init();
 void adc_init();
 uint16_t adc_read(uint8_t ch);
 
+
 int main(void)
 {
 	struct Ring_Buffer_F input_queue;
-	struct Ring_Buffer_F output_queue;
+	struct Ring_Buffer_C output_queue;
 	USART_Init(MYUBRR);
 	rb_initialize_F(&input_queue);
-    rb_initialize_F(&output_queue);
+    rb_initialize_C(&output_queue);
+	//union floatChar filteredVel;
 
 	timer0_init();
 	timer1_init();
@@ -44,46 +51,37 @@ int main(void)
 	PORTC |= 0b00000001;
 	
 	//Sampling frequency for converting to velocity, 1/0.001
-	//float sampPer = 1000;
-	float volt, angPos;
+	float sampPer = 1000;
+	float volt = 0;
+	float angPos = 0;
 	float angPosLast = 0;
 	float angVel = 0;
-
+	float filteredVel = 0;
     while (1) 
     {
-		//print_byte('.');
 		//if TIMER0_flag
 		if((TIFR0 & (1 << OCF0A)))
-		{		
-			//dequeue output
-			float output = rb_pop_front_F(&output_queue);			
-			//print_float*/
-			print_float(output);
+		{
+			/*for(int i=0; i <4; i++){
+				rb_push_back_C(&output_queue, filteredVel.asChars[i]);
+			}*/
+			print_float(filteredVel); //edit so we don't drop readings during prints
 			//reset TIMER0_flag
 			TIFR0 |= (1 << OCF0A);
 		}
 		//if TIMER1_flag
-		if((TIFR1 & (1 << OCF1B)))
+		if((TIFR1 & (1 << OCF1A)))
 		{
 			//read voltage 
 			volt = adc_read(1);	
 			//convert to position in radians
-			angPos = (-1.347E-13)*(pow(volt,6)) + (4.0362E-10)*(pow(volt,5)) + (-4.6747E-7)*(pow(volt,4)) + (2.6326E-4)*(pow(volt,3)) + -0.0743*(pow(volt,2)) + 10.1678*volt + (-645.4082 + 120); 
+			//inefficient
+			angPos = abs((-1.0193E-13)*(pow(volt,6)) + (3.0609E-10)*(pow(volt,5)) + (-3.5356E-7)*(pow(volt,4)) + (1.9698E-4)*(pow(volt,3)) + -0.0543*(pow(volt,2)) + 7.2116*volt + (-354.5305)); 
 			//wrap result
 
 			//convert to velocity
-			//angVel = (angPos - rb_pop_front_F(&input_queue))*sampPer*0.16667;
-			//angVel = (abs(angPos - angPosLast));//*sampPer;
-			
-			//need to add sampling frequency 
-			if(angPos < angPosLast)
-			{
-				angVel = (angPos - angPosLast) + 360;
-			} else
-			{
-				angVel = (angPos - angPosLast);
-			}
-			
+			// handle wrapping
+			angVel = (angPos - angPosLast) *0.00277778*sampPer; // rev/s
 			
 			if(!filtInit){
 				digital_filter_init(angVel);
@@ -92,17 +90,17 @@ int main(void)
 			
 			//add angPos to queue
 			angPosLast = angPos;
-			//rb_push_back_F(&input_queue, angPos); //needs to change to input_queue for this is for testing
 			
 			//filter velocity
-			angVel = filterValue(angVel);
+			//filteredVel.asFloat = filterValue(angVel);
+			filteredVel = filterValue(angVel);
 				
-			//add velocity to output queue
-			rb_push_back_F(&output_queue, angVel);			
-		
 			//reset TIMER1_flag
 			TIFR1 |= (1 << OCF1A);
 		} 
+		if (rb_length_C(&output_queue) > 0){
+			print_byte(rb_pop_front_C(&output_queue));
+		}
     }
 }
 
@@ -132,17 +130,10 @@ void timer1_init()
 
 void adc_init() {
 	
-	//Set reference to built in channels, set MUX to ADC1 to read from AI1
-	//ADMUX = (1<<REFS0)|(1<<MUX0);
+	//Set reference to built in channels
 	ADMUX = (1<<REFS0);
-	//Enable ADC w/ auto-trigger
-	//ADCSRA = (1<<ADEN)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
+	//Enable ADC w/  prescaler
 	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
-	//Set auto-trigger source to timer1 compare match
-	//ADCSRB = (1<<ADTS2)|(1<<ADTS0);
-	
-	//Disable digital input buffer on ADC1, saves power
-	//DIDR0 = (1<<ADC1D);
 	
 }
 

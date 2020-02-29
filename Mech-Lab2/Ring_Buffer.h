@@ -3,8 +3,8 @@
 
 #include "stdint.h"
 
-#define RB_LENGTH_F 8  // must be a power of 2. This is an easy place to adjust
-#define RB_LENGTH_C 32  // must be a power of 2. This is an easy place to adjust
+#define RB_LENGTH_F 16  // must be a power of 2. This is an easy place to adjust
+#define RB_LENGTH_C 8  // must be a power of 2. This is an easy place to adjust
 
 
 // data structure for a float ring buffer 

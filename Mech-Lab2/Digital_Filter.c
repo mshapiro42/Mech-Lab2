@@ -6,8 +6,10 @@ struct Ring_Buffer_F inputs;
 struct Ring_Buffer_F outputs;
 
 //a[0] should be entered as the inverse of the coeff, for computation speed
-float b[5] = {0.0940, 0.3759, 0.5639, 0.3759, 0.0940};
-float a[5] = {1.0000, 0.0000, 0.4860, 0.0000, 0.0177};
+//float b[5] = {0.0940, 0.3759, 0.5639, 0.3759, 0.0940};// cutoff frequency was 250
+//float a[5] = {1.0000, 0.0000, 0.4860, 0.0000, 0.0177};
+float b[5] = {0.018563010626897, 0.074252042507589, 0.111378063761383, 0.074252042507589, 0.018563010626897}; // cutoff frequency was 150
+float a[5] = {1.000000000000000,  -1.570398851228171,  1.275613324983279, -0.484403368335085, 0.076197064610332};
 uint8_t i;
 
 /* Initialization */
