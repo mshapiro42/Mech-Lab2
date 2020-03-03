@@ -57,6 +57,10 @@ int main(void)
 	float angPosLast = 0;
 	float angVel = 0;
 	float filteredVel = 0;
+	float term;
+	int i;
+	int j;
+	float conv[7] = {-1.0193E-13, 3.0609E-10, -3.5356E-7, 1.9698E-4, -0.0543, 7.2116, -354.5305};
     while (1) 
     {
 		//if TIMER0_flag
@@ -74,15 +78,28 @@ int main(void)
 		{
 			//read voltage 
 			volt = adc_read(1);	
-			//convert to position in radians
-			//inefficient
-			angPos = abs((-1.0193E-13)*(pow(volt,6)) + (3.0609E-10)*(pow(volt,5)) + (-3.5356E-7)*(pow(volt,4)) + (1.9698E-4)*(pow(volt,3)) + -0.0543*(pow(volt,2)) + 7.2116*volt + (-354.5305)); 
-			//wrap result
+			//convert to position in degrees
+			for(i = 0; i < sizeof(conv); i++)
+			{
+				if(i > 0)
+				{
+					for(j = sizeof(conv)-i-1; j > 0; j--)
+					{
+						term *= volt;
+					}
+					term *= conv[i];
+				} else
+				{
+					term = conv[i];
+				}
+				angPos += term;
+				term = 0;
+			}
 
 			//convert to velocity
-			// handle wrapping
 			angVel = (angPos - angPosLast) *0.00277778*sampPer; // rev/s
 			
+			//initialize filter after first velocity so buffer can be filled with relevant values
 			if(!filtInit){
 				digital_filter_init(angVel);
 				filtInit = 1;
