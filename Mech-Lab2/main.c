@@ -57,6 +57,9 @@ int main(void)
 	float angVel = 0;
 	float filteredVel = 0;
 	union floatChars printVal;
+	float convertCoeff[] = {-354.5305, 7.2116, -0.0543, 1.9698E-4, -3.5356E-7, 3.0609E-10, -1.0193E-13};
+	float tempSum = convertCoeff[0];
+
     while (1) 
     {
 		//if TIMER0_flag
@@ -74,10 +77,9 @@ int main(void)
 		{
 			//read voltage 
 			volt = adc_read(1);	
+			
 			//convert to position in radians
 			// Apply 6th order best fit line found in Matlab
-			float convertCoeff[] = {-354.5305, 7.2116, -0.0543, 1.9698E-4, -3.5356E-7, 3.0609E-10, -1.0193E-13};
-			float tempSum = convertCoeff[0];
 			for (int i = 1; i <= 6; i++){
 				tempSum += convertCoeff[i]*volt;
 				volt *= volt;
