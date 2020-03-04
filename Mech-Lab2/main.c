@@ -8,6 +8,7 @@
 #define F_CPU 16000000L //Clock speed of Arduino 16 MHz
 #define BAUD 9600       //Desired Baud Rate of Serial Communication
 #define MYUBRR F_CPU/16/BAUD-1 //Calculated value of UBRR to initialize USART
+#define TRANSMIT_READY UCSR0A & (1<<UDRE0) 
 
 #include <util/delay.h>
 #include <avr/io.h>
@@ -17,19 +18,17 @@
 #include "Serial.h"
 #include "Ring_Buffer.h"
 #include "Digital_Filter.h"
-/*
-union floatChar(){
-	float asFloat;
-	char asChars[4];
-};*/
 
-uint8_t filtInit = 0;
 
 void timer0_init();
 void timer1_init();
 void adc_init();
 uint16_t adc_read(uint8_t ch);
 
+union floatChars {
+	float asFloat;
+	char[4] asChars;
+}
 
 int main(void)
 {
@@ -38,11 +37,11 @@ int main(void)
 	USART_Init(MYUBRR);
 	rb_initialize_F(&input_queue);
     rb_initialize_C(&output_queue);
-	//union floatChar filteredVel;
 
 	timer0_init();
 	timer1_init();
 	adc_init();
+	digital_filter_init(0);
 	
 	//Set AI0 to Output and rest as Input
 	DDRC |= 0b00000001;
@@ -57,15 +56,16 @@ int main(void)
 	float angPosLast = 0;
 	float angVel = 0;
 	float filteredVel = 0;
+	union floatChars printVal;
     while (1) 
     {
 		//if TIMER0_flag
 		if((TIFR0 & (1 << OCF0A)))
 		{
-			/*for(int i=0; i <4; i++){
-				rb_push_back_C(&output_queue, filteredVel.asChars[i]);
-			}*/
-			print_float(filteredVel); //edit so we don't drop readings during prints
+			printVal.asFloat = filteredVel; //edit so we don't drop readings during prints
+			for(int i = 0; i < 4; i ++){
+				rb_push_back_C(&output_queue, printVal.asChars[i]);
+			}
 			//reset TIMER0_flag
 			TIFR0 |= (1 << OCF0A);
 		}
@@ -75,30 +75,29 @@ int main(void)
 			//read voltage 
 			volt = adc_read(1);	
 			//convert to position in radians
-			//inefficient
-			angPos = abs((-1.0193E-13)*(pow(volt,6)) + (3.0609E-10)*(pow(volt,5)) + (-3.5356E-7)*(pow(volt,4)) + (1.9698E-4)*(pow(volt,3)) + -0.0543*(pow(volt,2)) + 7.2116*volt + (-354.5305)); 
+			// Apply 6th order best fit line found in Matlab
+			float convertCoeff[] = {-354.5305, 7.2116, -0.0543, 1.9698E-4, -3.5356E-7, 3.0609E-10, -1.0193E-13};
+			float tempSum = convertCoeff[0];
+			for (int i = 1; i <= 6; i++){
+				tempSum += convertCoeff[i]*volt;
+				volt *= volt;
+			}
 			//wrap result
+			angPos = abs(tempSum); 
 
 			//convert to velocity
-			// handle wrapping
 			angVel = (angPos - angPosLast) *0.00277778*sampPer; // rev/s
-			
-			if(!filtInit){
-				digital_filter_init(angVel);
-				filtInit = 1;
-			}
 			
 			//add angPos to queue
 			angPosLast = angPos;
 			
 			//filter velocity
-			//filteredVel.asFloat = filterValue(angVel);
-			//filteredVel = filterValue(angVel);
-			filteredVel = angVel;	
+			filteredVel = filterValue(angVel);
+			
 			//reset TIMER1_flag
 			TIFR1 |= (1 << OCF1A);
 		} 
-		if (rb_length_C(&output_queue) > 0){
+		if (rb_length_C(&output_queue) > 0 && TRANSMIT_READY){
 			print_byte(rb_pop_front_C(&output_queue));
 		}
     }
@@ -132,7 +131,7 @@ void adc_init() {
 	
 	//Set reference to built in channels
 	ADMUX = (1<<REFS0);
-	//Enable ADC w/  prescaler
+	//Enable ADC w/ prescaler
 	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 	
 }

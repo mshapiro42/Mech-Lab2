@@ -41,7 +41,7 @@ float receive_float() { //Collect float from USART
 
 void print_byte(uint8_t value){
 	//while(!(UCSR0A & (1<<UDRE0)));
-	while(!(TRANSMIT_READY)); //after transmit line is ready
+	//while(!(TRANSMIT_READY)); //after transmit line is ready
 	UDR0 = value; //set transmit register to value
 }
 
