@@ -134,7 +134,7 @@ methods
     % create/config serial port structure
     
     %** IMPORTANT: Update to correct COM port
-    PortName = 'COM11';
+    PortName = 'COM12';
     % setup serial port
     try
         app.Port = serial(PortName, ...

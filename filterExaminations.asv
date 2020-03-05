@@ -1,6 +1,6 @@
 if exist('s','var') %If the serial port is open
     fclose(s);      %Close the serial port
-    delete(s);      %Delete the variable
+    delete(s);      %Delete the variable   
 end
 clear; clc; %close all;
 s = serial('COM12', 'BaudRate', 9600); %Establish Serial Port
@@ -28,11 +28,8 @@ legend('myFilter','raw input');
 i = 1;
 while (1)
     %result = 50*x(i) + 25 + 4*rand(1) - 2;
+    if(s.avail
     result = fread(s,1,'float');
-    while (~(result>0 && result<1024))
-        result = fread(s,1,'float');
-    end
-    disp(result);
     inputs = [result, inputs(1:end-1)];
     inputs2 = [result, inputs2(1:end-1)];
     filteredValue = filterValue(inputs, outputs, b, a);
@@ -44,8 +41,8 @@ while (1)
     delete(hplotdata);
     %hplotdata = plot(1:200,outputs2,'r',1:200,outputs3,'b',1:200,inputs2,'g');
     hplotdata = plot(1:200,outputs2,'b',1:200,inputs2,'r');
-    pause(.01);
-    i = mod(i, 100) + 1;
+    pause(.001);
+    i = mod(i, 100) + 1
 end
 
 

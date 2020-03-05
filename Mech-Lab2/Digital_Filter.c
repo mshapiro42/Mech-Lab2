@@ -20,7 +20,7 @@ void digital_filter_init(float reading){
 	for(i = 0; i <= 7; i++){	
 		rb_push_front_F(&inputs, reading);
 		rb_push_front_F(&outputs, reading);
-	}s
+	}
 	
 	return;
 }

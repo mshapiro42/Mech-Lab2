@@ -110,7 +110,7 @@ methods
 
 
         
-PortName = 'COM9'; %%% ** IMPORTANT: Update to correct COM port
+PortName = 'COM12'; %%% ** IMPORTANT: Update to correct COM port
 
         % create/config serial port structure
         if (isempty(PortName)) 
