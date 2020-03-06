@@ -166,7 +166,7 @@ PortName = 'COM12'; %%% ** IMPORTANT: Update to correct COM port
         % ---------------- Real Time Plot -------------------%
         %subplot(1,3,1); 
         app.Gui.Plot.RealTime = plot(app.Gui.Time, app.Gui.RealTime);
-        ylim([-700 700]);    %%% IMPORTANT: can update y axis limits here
+        ylim([-1000 1000]);    %%% IMPORTANT: can update y axis limits here
         xlim([0 app.Gui.BUFFERLENGTH/30]);  
         set(app.Gui.Plot.RealTime, 'Color', [0.8 0 0.2], ...
                   'linewidth', 2, ...

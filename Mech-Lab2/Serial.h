@@ -7,7 +7,7 @@
  */ 
 
 
-void USART_Init(uint8_t);
+void USART_Init(uint8_t, uint8_t);
 uint8_t receive_byte();
 float receive_float();
 void print_byte(uint8_t);

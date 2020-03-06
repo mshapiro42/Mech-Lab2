@@ -13,30 +13,30 @@ float a[5] = {1.000000000000000,  -1.570398851228171,  1.275613324983279, -0.484
 uint8_t i;
 
 /* Initialization */
-void digital_filter_init(float reading){
+void digital_filter_init(){
 	rb_initialize_F(&inputs);
 	rb_initialize_F(&outputs);
 	
-	for(i = 0; i <= 7; i++){	
-		rb_push_front_F(&inputs, reading);
-		rb_push_front_F(&outputs, reading);
+	for(i = 0; i <= order + 1; i++){	
+		rb_push_front_F(&inputs, 0);
+		rb_push_front_F(&outputs, 0);
 	}
 	
 	return;
 }
 
-float filterValue(float angularVelocity){
+float filterValue(float newInput){
 	rb_pop_back_F(&inputs);
-	rb_push_front_F(&inputs, angularVelocity);
-	float angVel = 0.0;
-	for(i=0; i <= 4; i++){	
-		angVel += b[i]*rb_get_F(&inputs,i);
+	rb_pop_back_F(&outputs);
+	rb_push_front_F(&inputs, newInput);
+	float newOutput = 0;
+	for(i=0; i < order + 1; i++){	
+		newOutput += b[i]*rb_get_F(&inputs,i);
 		if (i>0){
-			angVel -= a[i]*rb_get_F(&outputs,i);
+			newOutput -= a[i]*rb_get_F(&outputs,i-1);
 		}
 	}
-	angVel *= a[0];
-	rb_pop_back_F(&outputs);
-	rb_push_front_F(&outputs, angVel);
-	return angVel;
+	newOutput *= a[0];
+	rb_push_front_F(&outputs, newOutput);
+	return newOutput;
 }

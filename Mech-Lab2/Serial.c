@@ -10,17 +10,19 @@
 
 #define NEW_MSG UCSR0A & (1<<RXC0)
 #define TRANSMIT_READY UCSR0A & (1<<UDRE0) 
+uint8_t byteWise = 0;
 
 union floatChars {
 	float asFloat;
 	char asChar[4];
 	};
 
-void USART_Init(uint8_t ubrr){ //Initialize USART for serial communication
+void USART_Init(uint8_t ubrr, uint8_t byte){ //Initialize USART for serial communication
 	UBRR0H = (unsigned char)(ubrr>>8); // Split ubrr value to 2 registers, high and low
 	UBRR0L = (unsigned char)ubrr;
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0); //Initialize USART as Input and Output
 	UCSR0C = 0x06; //8 Data bits, No Parity Bit, 1 Stop bit
+	byteWise = byte;
 }
 
 uint8_t receive_byte() { //Collect data from USART
@@ -40,7 +42,7 @@ float receive_float() { //Collect float from USART
 
 void print_byte(uint8_t value){
 	//while(!(UCSR0A & (1<<UDRE0)));
-	while(!(TRANSMIT_READY)); //after transmit line is ready
+	if (!byteWise) while(!(TRANSMIT_READY)); //after transmit line is ready
 	UDR0 = value; //set transmit register to value
 }
 
