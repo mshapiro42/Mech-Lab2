@@ -8,9 +8,9 @@
 #define F_CPU 16000000L //Clock speed of Arduino 16 MHz
 #define BAUD 9600       //Desired Baud Rate of Serial Communication
 #define MYUBRR F_CPU/16/BAUD-1 //Calculated value of UBRR to initialize USART
-#define TRANSMIT_READY UCSR0A & (1<<UDRE0) 
-#define TIMER0_FLAG (TIFR0 & (1 << OCF0A))
-#define TIMER1_FLAG (TIFR1 & (1 << OCF1A))
+//#define TRANSMIT_READY UCSR0A & (1<<UDRE0) 
+//#define TIMER0_FLAG (TIFR0 & (1 << OCF0A))
+//#define TIMER1_FLAG (TIFR1 & (1 << OCF1A))
 
 #include <util/delay.h>
 #include <avr/io.h>
@@ -26,22 +26,22 @@ void timer0_init();
 void timer1_init();
 void adc_init();
 uint16_t adc_read(uint8_t ch);
-
+/*
 union floatChars {
 	float asFloat;
 	char asChars[4];
-};
+};*/
 
 int main(void)
 {
-	struct Ring_Buffer_C output_queue;
+	//struct Ring_Buffer_C output_queue;
 	USART_Init(MYUBRR);
-    rb_initialize_C(&output_queue);
+    //rb_initialize_C(&output_queue);
 
 	timer0_init();
 	timer1_init();
 	adc_init();
-	digital_filter_init(0);
+	//digital_filter_init(0);
 	
 	//Set AI0 to Output and rest as Input
 	DDRC |= 0b00000001;
@@ -56,25 +56,26 @@ int main(void)
 	//float angPosLast = 0;
 	//float angVel = 0;
 	//float filteredVel = 0;
-	union floatChars printVal;
+	//union floatChars printVal;
 	float convertCoeff[] = {-354.5305, 7.2116, -0.0543, 1.9698E-4, -3.5356E-7, 3.0609E-10, -1.0193E-13};
-	float tempSum = convertCoeff[0];
+	float tempSum;
 
     while (1) 
     {
 		//if TIMER0_flag
-		if(TIMER0_FLAG)
+		if(TIFR0 & (1 << OCF0A))
 		{
-			printVal.asFloat = 500; //edit so we don't drop readings during prints
+			/*printVal.asFloat = 500; //edit so we don't drop readings during prints
 			printVal.asFloat = angPos;
 			for(int i = 0; i < 4; i ++){
 				rb_push_back_C(&output_queue, printVal.asChars[i]);
-			}
+			}*/
+			print_float(angPos);
 			//reset TIMER0_flag
 			TIFR0 |= (1 << OCF0A);
 		}
 		//if TIMER1_flag
-		if(TIMER1_FLAG)
+		if(TIFR1 & (1 << OCF1A))
 		{
 			//read voltage 
 			volt = adc_read(1);	
@@ -87,7 +88,7 @@ int main(void)
 				volt *= volt;
 			}
 			//wrap result
-			angPos = tempSum; 
+			angPos = tempSum;
 
 			//convert to velocity
 			//angVel = (angPos - angPosLast) *0.00277778*sampPer; // rev/s
@@ -101,9 +102,9 @@ int main(void)
 			//reset TIMER1_flag
 			TIFR1 |= (1 << OCF1A);
 		} 
-		if (rb_length_C(&output_queue) > 0 && TRANSMIT_READY){
+		/*if (rb_length_C(&output_queue) > 0 && TRANSMIT_READY){
 			print_byte(rb_pop_front_C(&output_queue));
-		}
+		}*/
     }
 }
 
